@@ -21,6 +21,7 @@ namespace UADInstaller
         public List<Product> AllProducts { get; set; } = new List<Product>();
         public string UADLocStore { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UADInstallationLocation.txt");
         public VersionManager LocalVersionManager;
+        public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36";
         public Release[] ReleasesChangelog { get; set; }
 
         public const string Version = "v1.0";
@@ -98,7 +99,7 @@ namespace UADInstaller
             try
             {
                 var infoReq = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/quangaming2929/UniversalAnimeDownloader/releases");
-                infoReq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36";
+                infoReq.UserAgent = UserAgent;
                 using (var infoResp = await infoReq.GetResponseAsync())
                 {
                     using (var stream = infoResp.GetResponseStream())
@@ -150,7 +151,7 @@ namespace UADInstaller
             try
             {
                 var infoReq = (HttpWebRequest)WebRequest.Create("https://raw.githubusercontent.com/quangaming2929/UniversalAnimeDownloader/master/README.md");
-                infoReq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36";
+                infoReq.UserAgent = UserAgent;
                 using (var infoResp = await infoReq.GetResponseAsync())
                 {
                     using (var stream = infoResp.GetResponseStream())
@@ -219,6 +220,96 @@ namespace UADInstaller
                 installLoc.Text = dialog.SelectedPath;
             }
 
+        }
+
+        private void Event_Install(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if(!string.IsNullOrEmpty(installLoc.Text))
+            {
+                try
+                {
+                    if(!Directory.Exists(installLoc.Text))
+                    {
+                        Directory.CreateDirectory(installLoc.Text);
+                    }
+
+                    var lastestFile = GetLastestVersionManger();
+
+
+                    List<string> filesToDownload = btnInstall.Content.ToString() == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(null, null);
+
+                    DownloadFileFromGithub(filesToDownload, installLoc.Text);
+
+                    if(btnInstall.Content.ToString() == "Install")
+                    {
+                        GetDefaultMod();
+                    }
+                }
+                catch { }
+            }
+
+        }
+
+        private void GetDefaultMod()
+        {
+            var modsFolder = Path.Combine(installLoc.Text, "Mods");
+
+            //HttpWebRequest req = (HttpWebRequest)WebRequest.Create()
+        }
+
+        private void DownloadFileFromGithub(List<string> filesToDownload, string installLoc)
+        {
+            foreach (var item in filesToDownload)
+            {
+                string url = $"https://raw.githubusercontent.com/quangaming2929/UADInstaller/master/UADVersions/{ReleasesChangelog[0].tag_name}/{item}";
+                var req = (HttpWebRequest)WebRequest.Create(url);
+                req.UserAgent = UserAgent;
+                using (var resp = req.GetResponse())
+                {
+                    using (var stream = resp.GetResponseStream())
+                    {
+                        var loc = Path.Combine(installLoc, item);
+                        if (File.Exists(installLoc))
+                            File.Delete(installLoc);
+
+                        using (var fs = File.Create(loc))
+                        {
+                            fs.Position = 0;
+                            stream.CopyTo(fs);
+                        }
+                    }
+                }
+            }
+        }
+
+        private List<string> CompareFilesVersion(VersionManager oldVersion, VersionManager newVersion)
+        {
+            return null;
+        }
+
+        private List<string> GetAllFileToDownload(VersionManager manager)
+        {
+            var filesName = new List<string>();
+            foreach (var item in manager.FileVersion)
+                filesName.Add(item.FileName);
+
+            return filesName;
+        }
+
+        private VersionManager GetLastestVersionManger()
+        {
+            string url = $"https://raw.githubusercontent.com/quangaming2929/UADInstaller/master/UADVersions/{ReleasesChangelog[0].tag_name}/VersionManager.json";
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+            req.UserAgent = UserAgent;
+            using (var resp = req.GetResponse())
+            {
+                using (var stream = resp.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(stream);
+                    string content = reader.ReadToEnd();
+                    return JsonConvert.DeserializeObject<VersionManager>(content);
+                }
+            }
         }
     }
 
