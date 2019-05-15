@@ -11,7 +11,7 @@ namespace UADInstaller
         public string Name { get; set; }
         public string Version { get; set; }
         public string Description { get; set; }
-
+        public bool IsViewButtonEnable { get; set; }
         public bool IsButtonEnable { get; set; }
     }
 }
