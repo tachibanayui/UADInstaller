@@ -13,6 +13,7 @@ using UADInstaller.Jsons;
 
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace UADInstaller
 {
@@ -204,14 +205,14 @@ namespace UADInstaller
             return false;
         }
 
-        private void Event_LaunchUAD(object sender, System.Windows.RoutedEventArgs e)
+        private void Event_LaunchUAD(object sender, RoutedEventArgs e)
         {
             string res;
             if (CheckForUADLocStore(out res))
             {
                 DirectoryInfo info = new DirectoryInfo(res);
                 var exe = Path.Combine(info.Parent.FullName, "UniversalAnimeDownloader.exe");
-                Process.Start(exe);
+                try { Process.Start(exe); } catch { }
             }
         }
 
@@ -253,7 +254,7 @@ namespace UADInstaller
 
                         Dispatcher.Invoke(() => txblStatus.Text = "Checking files...");
 
-                        List<string> filesToDownload = btnContent == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(null, null);
+                        List<string> filesToDownload = btnContent == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(GetLastestVersionManger(), GetLocalVersionManager());
                         filesToDownload.Add("VersionManager.json");
 
                         DownloadFileFromGithub(filesToDownload, installLocal);
@@ -388,7 +389,25 @@ namespace UADInstaller
 
         private List<string> CompareFilesVersion(VersionManager oldVersion, VersionManager newVersion)
         {
-            return null;
+            var res = new List<string>();
+
+            foreach (var item in newVersion.FileVersion)
+            {
+                var oldVerItem = oldVersion.FileVersion.FirstOrDefault(p => p.FileName == item.FileName);
+                if(oldVersion != null)
+                {
+                    if(oldVerItem.Version < item.Version)
+                    {
+                        res.Add(item.FileName);
+                    }
+                }
+                else
+                {
+                    res.Add(item.FileName);
+                }
+            }
+
+            return res;
         }
 
         private List<string> GetAllFileToDownload(VersionManager manager)
@@ -413,6 +432,27 @@ namespace UADInstaller
                     string content = reader.ReadToEnd();
                     return JsonConvert.DeserializeObject<VersionManager>(content);
                 }
+            }
+        }
+
+        private VersionManager GetLocalVersionManager()
+        {
+            if(File.Exists(UADLocStore))
+            {
+                var versionManagerFile = File.ReadAllText(UADLocStore);
+                if(File.Exists(versionManagerFile))
+                {
+                    var managerFileContent = File.ReadAllText(versionManagerFile);
+                    return JsonConvert.DeserializeObject<VersionManager>(managerFileContent);
+                }
+                else
+                {
+                    throw new FileNotFoundException(versionManagerFile);
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException();
             }
         }
 
@@ -450,6 +490,16 @@ namespace UADInstaller
 
             if(File.Exists(UADLocStore))
                 File.WriteAllText(UADLocStore,"");
+        }
+
+        private void Event_Locate(object sender, RoutedEventArgs e)
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                File.WriteAllText(UADLocStore, Path.Combine(dialog.SelectedPath, "VersionManager.json"));
+                CheckInstallationStatus();
+            }
         }
     }
 

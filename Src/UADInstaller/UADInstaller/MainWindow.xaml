@@ -132,6 +132,7 @@
                     <Button
                         x:Name="btnLocate"
                         Width="125"
+                        Click="Event_Locate"
                         Height="50"
                         Content="Locate" />
                 </Controls:DropDownButton.Items>
