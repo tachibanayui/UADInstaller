@@ -5,11 +5,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using UADInstaller.Jsons;
+
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
+using System.Threading.Tasks;
 
 namespace UADInstaller
 {
@@ -212,7 +215,7 @@ namespace UADInstaller
             }
         }
 
-        private void Event_GetFolder(object sender, System.Windows.RoutedEventArgs e)
+        private void Event_GetFolder(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -222,45 +225,145 @@ namespace UADInstaller
 
         }
 
-        private void Event_Install(object sender, System.Windows.RoutedEventArgs e)
+        private async void Event_Install(object sender, RoutedEventArgs e)
         {
-            if(!string.IsNullOrEmpty(installLoc.Text))
+            string installLocal = installLoc.Text;
+            string btnContent = btnInstall.Content.ToString();
+            if (!string.IsNullOrEmpty(installLocal))
             {
                 try
                 {
-                    if(!Directory.Exists(installLoc.Text))
+                    await Task.Run(() => 
                     {
-                        Directory.CreateDirectory(installLoc.Text);
-                    }
+                        Dispatcher.Invoke(() =>
+                        {
+                            rpProgress.Visibility = Visibility.Visible;
+                            pgStatus.Value = 0;
+                            btnInstall.IsEnabled = false;
+                            txblStatus.Text = "Getting infomation...";
+                            pgStatus.IsIndeterminate = true;
 
-                    var lastestFile = GetLastestVersionManger();
+                            if (!Directory.Exists(installLocal))
+                            {
+                                Directory.CreateDirectory(installLocal);
+                            }
+                        });
 
+                        var lastestFile = GetLastestVersionManger();
 
-                    List<string> filesToDownload = btnInstall.Content.ToString() == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(null, null);
+                        Dispatcher.Invoke(() => txblStatus.Text = "Checking files...");
 
-                    DownloadFileFromGithub(filesToDownload, installLoc.Text);
+                        List<string> filesToDownload = btnContent == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(null, null);
+                        filesToDownload.Add("VersionManager.json");
 
-                    if(btnInstall.Content.ToString() == "Install")
-                    {
-                        GetDefaultMod();
-                    }
+                        DownloadFileFromGithub(filesToDownload, installLocal);
+
+                        if (btnContent == "Install")
+                        {
+                            Dispatcher.Invoke(() => pgStatus.Value = 0.95);
+                            GetDefaultMod();
+                            CreateShortCut();
+                        }
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            txblStatus.Text = "Done!";
+                            pgStatus.Value = 1;
+                        });
+
+                        File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UADInstallationLocation.txt"), Path.Combine(installLocal, "VersionManager.json"));
+                    });
+
+                    await Task.Delay(5000);
+                    rpProgress.Visibility = Visibility.Collapsed;
+                    btnInstall.IsEnabled = false;
+                    btnInstall.Content = "Update";
+                    btnLaunch.IsEnabled = true;
+                    btnUnistall.IsEnabled = true;
+                    btnLocate.IsEnabled = false;
                 }
                 catch { }
             }
 
         }
 
+        private void CreateShortCut()
+        {
+            //Desktop shortcut
+            IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
+            string shortcutAddress = (string)shell.SpecialFolders.Item("Desktop") + @"\Universal Anime Downloader.lnk";
+            IWshRuntimeLibrary.IWshShortcut shortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(shortcutAddress);
+            shortcut.Description = "Universal Anime Downloader (UAD) is a anime downloader/extractor tool to get and watch anime with minimal effort to search and download. This program also a video player with unique feature help you watch anime easier ";
+            string isnLoc = string.Empty;
+            Dispatcher.Invoke(() => installLoc.Text);
+            shortcut.TargetPath = Path.Combine(isnLoc, "UniversalAnimeDownloader.exe");
+            //shortcut.IconLocation = 
+            shortcut.Save();
+
+            //StartMenu shortcut
+            object shStartMenu = (object)"Desktop";
+            IWshRuntimeLibrary.WshShell shell2 = new IWshRuntimeLibrary.WshShell();
+            string shortcutAddress2 = (string)shell2.SpecialFolders.Item("Programs") + @"\Universal Anime Downloader.lnk";
+            IWshRuntimeLibrary.IWshShortcut shortcut2 = (IWshRuntimeLibrary.IWshShortcut)shell2.CreateShortcut(shortcutAddress2);
+            shortcut2.Description = "Universal Anime Downloader (UAD) is a anime downloader/extractor tool to get and watch anime with minimal effort to search and download. This program also a video player with unique feature help you watch anime easier ";
+            shortcut2.TargetPath = Path.Combine(isnLoc, "UniversalAnimeDownloader.exe");
+            //shortcut2.IconLocation = 
+            shortcut2.Save();
+        }
+
         private void GetDefaultMod()
         {
-            var modsFolder = Path.Combine(installLoc.Text, "Mods");
+            string installLocal = string.Empty;
+            Dispatcher.Invoke(() => 
+            {
+                txblStatus.Text = "Downloading default mod...";
+                installLocal = installLoc.Text;
+            });
+            var modsFolder = Path.Combine(installLocal, "Mods");
+            if (!Directory.Exists(modsFolder))
+                Directory.CreateDirectory(modsFolder);
 
-            //HttpWebRequest req = (HttpWebRequest)WebRequest.Create()
+            var req = (HttpWebRequest)WebRequest.Create("https://github.com/quangaming2929/UADInstaller/raw/master/UADVersions/Default%20Assets/QGExtractor.dll");
+            req.UserAgent = UserAgent;
+            using (var resp = req.GetResponse())
+            {
+                using (var stream = resp.GetResponseStream())
+                {
+                    using (var fs = File.Create(Path.Combine(modsFolder, "QGExtractor.dll")))
+                    {
+                        fs.Position = 0;
+                        stream.CopyTo(fs);
+                    }
+                }
+            }
+
+            var req2 = (HttpWebRequest)WebRequest.Create("https://github.com/quangaming2929/UADInstaller/raw/master/UADVersions/Default%20Assets/HtmlAgilityPack.dll");
+            req2.UserAgent = UserAgent;
+            using (var resp2 = req2.GetResponse())
+            {
+                using (var stream2 = resp2.GetResponseStream())
+                {
+                    using (var fs2 = File.Create(Path.Combine(modsFolder, "HtmlAgilityPack.dll")))
+                    {
+                        fs2.Position = 0;
+                        stream2.CopyTo(fs2);
+                    }
+                }
+            }
+
         }
 
         private void DownloadFileFromGithub(List<string> filesToDownload, string installLoc)
         {
+            int currentFile = 1;
             foreach (var item in filesToDownload)
             {
+                Dispatcher.Invoke(() =>
+                {
+                    txblStatus.Text = $"Downloading {item} ({currentFile}/{filesToDownload.Count})...";
+                    pgStatus.IsIndeterminate = false;
+                    pgStatus.Value = currentFile / (double)filesToDownload.Count * 0.9d;
+                });
                 string url = $"https://raw.githubusercontent.com/quangaming2929/UADInstaller/master/UADVersions/{ReleasesChangelog[0].tag_name}/{item}";
                 var req = (HttpWebRequest)WebRequest.Create(url);
                 req.UserAgent = UserAgent;
@@ -276,6 +379,7 @@ namespace UADInstaller
                         {
                             fs.Position = 0;
                             stream.CopyTo(fs);
+                            currentFile++;
                         }
                     }
                 }

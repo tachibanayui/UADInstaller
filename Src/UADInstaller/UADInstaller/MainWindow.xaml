@@ -10,6 +10,7 @@
     xmlns:local="clr-namespace:UADInstaller"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="clr-namespace:Markdown.Xaml;assembly=Markdown.Xaml"
+    x:Name="wd"
     Title="Universal Anime Downloader Installer"
     Width="960"
     Height="600"
@@ -70,7 +71,36 @@
             </Grid.ColumnDefinitions>
             <TextBlock VerticalAlignment="Center" Text="Install Location: " />
             <TextBox x:Name="installLoc" Grid.Column="2" />
-            <Button Click="Event_GetFolder" Content="..." Grid.Column="3" Width="25" />
+            <Button
+                Grid.Column="3"
+                Width="25"
+                Click="Event_GetFolder"
+                Content="..." />
+        </Grid>
+
+        <Grid
+            x:Name="rpProgress"
+            Grid.Column="2"
+            Width="500"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Background="{Binding ElementName=wd, Path=Background}"
+            Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <TextBlock
+                x:Name="txblStatus"
+                FontSize="15"
+                Text="Getting newest update infomation..." />
+            <ProgressBar
+                Minimum="0"
+                Maximum="1"
+                x:Name="pgStatus"
+                Grid.Row="2"
+                IsIndeterminate="True" />
         </Grid>
         <Grid
             Grid.Column="2"
@@ -86,9 +116,9 @@
 
             <Button
                 x:Name="btnInstall"
-                Click="Event_Install"
                 Width="125"
                 Height="50"
+                Click="Event_Install"
                 Content="Install"
                 FontSize="24" />
             <Controls:DropDownButton Grid.Column="1" Width="25">
