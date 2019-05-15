@@ -19,6 +19,8 @@ namespace UADInstaller
     public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     {
         public List<Product> AllProducts { get; set; } = new List<Product>();
+        public string UADLocStore { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UADInstallationLocation.txt");
+        public VersionManager LocalVersionManager;
         public Release[] ReleasesChangelog { get; set; }
 
         public const string Version = "v1.0";
@@ -32,41 +34,136 @@ namespace UADInstaller
             GetChangeLog();
         }
 
-        private async void GetChangeLog()
+        private bool CheckForUADLocStore(out string res)
         {
-            var infoReq = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/quangaming2929/UniversalAnimeDownloader/releases");
-            infoReq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36";
-            using (var infoResp = await infoReq.GetResponseAsync())
+            try
             {
-                using (var stream = infoResp.GetResponseStream())
+                if (File.Exists(UADLocStore))
                 {
-                    StreamReader reader = new StreamReader(stream);
-                    string content = await reader.ReadToEndAsync();
-                    var jsonSetting = new JsonSerializerSettings()
+                    var uadLoc = File.ReadAllText(UADLocStore);
+                    if (File.Exists(uadLoc))
                     {
-                        Error = new EventHandler<ErrorEventArgs>((s, e) => e.ErrorContext.Handled = true),
-                        TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full,
-                    };
-                    ReleasesChangelog = JsonConvert.DeserializeObject<Release[]>(content);
-                    foreach (var item in ReleasesChangelog)
-                        item.body = AddHtmlColorBody(item.body, Colors.White);
-                    changelog.ItemsSource = ReleasesChangelog;
+                        res = uadLoc;
+                        return true;
+                    }
+                }
+
+            }
+            catch
+            {
+                res = string.Empty;
+                return false;
+            }
+
+            res = string.Empty;
+            return false;
+        }
+
+        private void CheckInstallationStatus()
+        {
+            string res;
+            if (CheckForUADLocStore(out res))
+            {
+                btnInstall.Content = "Update";
+                btnUnistall.IsEnabled = true;
+                btnLocate.IsEnabled = false;
+
+                var localVerionText = File.ReadAllText(res);
+                LocalVersionManager = JsonConvert.DeserializeObject<VersionManager>(localVerionText);
+                txblVersion.Text = $"Version: {LocalVersionManager.GlobalVersion}";
+                installLoc.Text = new DirectoryInfo(res).Parent.FullName;
+                if (CompareVersion(ReleasesChangelog[0].tag_name, LocalVersionManager.GlobalVersion))
+                {
+                    btnInstall.IsEnabled = true;
+                    btnLaunch.IsEnabled = false;
+                }
+                else
+                {
+                    btnInstall.IsEnabled = false;
+                    btnLaunch.IsEnabled = true;
                 }
             }
+            else
+            {
+                btnInstall.Content = "Install";
+                btnInstall.IsEnabled = true;
+                btnLaunch.IsEnabled = false;
+                btnLocate.IsEnabled = true;
+                btnUnistall.IsEnabled = false;
+            }
+        }
+
+        private async void GetChangeLog()
+        {
+            try
+            {
+                var infoReq = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/quangaming2929/UniversalAnimeDownloader/releases");
+                infoReq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36";
+                using (var infoResp = await infoReq.GetResponseAsync())
+                {
+                    using (var stream = infoResp.GetResponseStream())
+                    {
+                        StreamReader reader = new StreamReader(stream);
+                        string content = await reader.ReadToEndAsync();
+                        var jsonSetting = new JsonSerializerSettings()
+                        {
+                            Error = new EventHandler<ErrorEventArgs>((s, e) => e.ErrorContext.Handled = true),
+                            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full,
+                        };
+                        ReleasesChangelog = JsonConvert.DeserializeObject<Release[]>(content);
+                        foreach (var item in ReleasesChangelog)
+                            item.body = AddHtmlColorBody(item.body, Colors.White);
+                        changelog.ItemsSource = ReleasesChangelog;
+                    }
+                }
+
+                CheckInstallationStatus();
+            }
+            catch
+            {
+                btnInstall.Content = "Offline";
+                btnInstall.IsEnabled = false;
+                string res;
+                if(CheckForUADLocStore(out res))
+                {
+                    DirectoryInfo info = new DirectoryInfo(res);
+                    var exe = Path.Combine(info.Parent.FullName, "UniversalAnimeDownloader.exe");
+                    if (File.Exists(exe))
+                    {
+                        btnLaunch.IsEnabled = true;
+                        btnUnistall.IsEnabled = true;
+                        btnLocate.IsEnabled = false;
+                    }
+                    else
+                    {
+                        btnLaunch.IsEnabled = false;
+                        btnUnistall.IsEnabled = false;
+                        btnLocate.IsEnabled = true;
+                    }
+                }
+            }
+
         }
 
         private async void GetInfomation()
         {
-            var infoReq = (HttpWebRequest)WebRequest.Create("https://raw.githubusercontent.com/quangaming2929/UniversalAnimeDownloader/master/README.md");
-            infoReq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36";
-            using (var infoResp = await infoReq.GetResponseAsync())
+            try
             {
-                using (var stream = infoResp.GetResponseStream())
+                var infoReq = (HttpWebRequest)WebRequest.Create("https://raw.githubusercontent.com/quangaming2929/UniversalAnimeDownloader/master/README.md");
+                infoReq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36";
+                using (var infoResp = await infoReq.GetResponseAsync())
                 {
-                    StreamReader reader = new StreamReader(stream);
-                    string content = await reader.ReadToEndAsync();
-                    htmlInfo.Text = AddHtmlColorBody(content, Colors.White);
+                    using (var stream = infoResp.GetResponseStream())
+                    {
+                        StreamReader reader = new StreamReader(stream);
+                        string content = await reader.ReadToEndAsync();
+                        htmlInfo.Text = AddHtmlColorBody(content, Colors.White);
+                    }
                 }
+            }
+            catch
+            {
+                htmlInfo.Text = "Failed to get info data :(";
             }
         }
 
@@ -85,6 +182,43 @@ namespace UADInstaller
         private void FeedbackButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Process.Start("https://github.com/quangaming2929/UniversalAnimeDownloader/issues");
+        }
+
+        private static bool CompareVersion(string v1, string v2)
+        {
+            var newVer = v1.Substring(1).Split('.');
+            var oldVer = v2.Substring(1).Split('.');
+
+            for (int i = 0; i < Math.Min(newVer.Length, oldVer.Length); i++)
+            {
+                if (int.Parse(newVer[i]) > int.Parse(oldVer[i]))
+                    return true;
+
+                if (int.Parse(newVer[i]) < int.Parse(oldVer[i]))
+                    return false;
+            }
+            return false;
+        }
+
+        private void Event_LaunchUAD(object sender, System.Windows.RoutedEventArgs e)
+        {
+            string res;
+            if (CheckForUADLocStore(out res))
+            {
+                DirectoryInfo info = new DirectoryInfo(res);
+                var exe = Path.Combine(info.Parent.FullName, "UniversalAnimeDownloader.exe");
+                Process.Start(exe);
+            }
+        }
+
+        private void Event_GetFolder(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                installLoc.Text = dialog.SelectedPath;
+            }
+
         }
     }
 

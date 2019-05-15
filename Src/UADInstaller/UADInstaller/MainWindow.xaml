@@ -10,7 +10,7 @@
     xmlns:local="clr-namespace:UADInstaller"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="clr-namespace:Markdown.Xaml;assembly=Markdown.Xaml"
-    Title=""
+    Title="Universal Anime Downloader Installer"
     Width="960"
     Height="600"
     mc:Ignorable="d">
@@ -52,10 +52,26 @@
             Foreground="MediumPurple"
             Text="Universal Anime Downloader" />
         <TextBlock
+            x:Name="txblVersion"
             Grid.Column="2"
             Margin="20,70"
             FontSize="24"
             Foreground="LightGray" />
+        <Grid
+            Grid.Column="2"
+            Width="500"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock VerticalAlignment="Center" Text="Install Location: " />
+            <TextBox x:Name="installLoc" Grid.Column="2" />
+            <Button Click="Event_GetFolder" Content="..." Grid.Column="3" Width="25" />
+        </Grid>
         <Grid
             Grid.Column="2"
             Width="150"
@@ -77,10 +93,12 @@
             <Controls:DropDownButton Grid.Column="1" Width="25">
                 <Controls:DropDownButton.Items>
                     <Button
+                        x:Name="btnUnistall"
                         Width="125"
                         Height="50"
                         Content="Uninstall" />
                     <Button
+                        x:Name="btnLocate"
                         Width="125"
                         Height="50"
                         Content="Locate" />
@@ -95,6 +113,7 @@
             Margin="0,100,25,0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
+            Click="Event_LaunchUAD"
             Content="Launch"
             FontSize="24" />
         <Separator
