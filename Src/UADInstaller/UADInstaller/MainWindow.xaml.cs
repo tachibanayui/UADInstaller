@@ -26,6 +26,11 @@ namespace UADInstaller
         public VersionManager LocalVersionManager;
         public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36";
         public Release[] ReleasesChangelog { get; set; }
+        private JsonSerializerSettings JsonSetting = new JsonSerializerSettings()
+        {
+            Error = new EventHandler<ErrorEventArgs>((s, e) => e.ErrorContext.Handled = true),
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full,
+        };
 
         public const string Version = "v1.0";
 
@@ -109,12 +114,7 @@ namespace UADInstaller
                     {
                         StreamReader reader = new StreamReader(stream);
                         string content = await reader.ReadToEndAsync();
-                        var jsonSetting = new JsonSerializerSettings()
-                        {
-                            Error = new EventHandler<ErrorEventArgs>((s, e) => e.ErrorContext.Handled = true),
-                            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full,
-                        };
-                        ReleasesChangelog = JsonConvert.DeserializeObject<Release[]>(content);
+                        ReleasesChangelog = JsonConvert.DeserializeObject<Release[]>(content, JsonSetting);
                         foreach (var item in ReleasesChangelog)
                             item.body = AddHtmlColorBody(item.body, Colors.White);
                         changelog.ItemsSource = ReleasesChangelog;
@@ -414,6 +414,42 @@ namespace UADInstaller
                     return JsonConvert.DeserializeObject<VersionManager>(content);
                 }
             }
+        }
+
+        private async void Event_Uninstall(object sender, RoutedEventArgs e)
+        {
+            string installLoc = this.installLoc.Text;
+            string UADSettings = Path.Combine(installLoc, "Settings", "UserSetting.json");
+            string animeLibrary = string.Empty;
+
+            await Task.Run(() => 
+            {
+                if (File.Exists(UADSettings))
+                {
+                    var content = File.ReadAllText(UADSettings);
+                    animeLibrary = JsonConvert.DeserializeObject<UADSettingsData>(content, JsonSetting)?.AnimeLibraryLocation;
+                }
+
+                foreach (var item in Directory.EnumerateDirectories(installLoc))
+                {
+                    if (item != animeLibrary)
+                        Directory.Delete(item, true);
+                }
+
+                foreach (var item in Directory.EnumerateFiles(installLoc))
+                {
+                    File.Delete(item);
+                }
+            });
+
+            btnInstall.IsEnabled = true;
+            btnInstall.Content = "Install";
+            btnLaunch.IsEnabled = false;
+            btnUnistall.IsEnabled = false;
+            btnLocate.IsEnabled = true;
+
+            if(File.Exists(UADLocStore))
+                File.WriteAllText(UADLocStore,"");
         }
     }
 

@@ -96,11 +96,11 @@
                 FontSize="15"
                 Text="Getting newest update infomation..." />
             <ProgressBar
-                Minimum="0"
-                Maximum="1"
                 x:Name="pgStatus"
                 Grid.Row="2"
-                IsIndeterminate="True" />
+                IsIndeterminate="True"
+                Maximum="1"
+                Minimum="0" />
         </Grid>
         <Grid
             Grid.Column="2"
@@ -125,6 +125,7 @@
                 <Controls:DropDownButton.Items>
                     <Button
                         x:Name="btnUnistall"
+                        Click="Event_Uninstall"
                         Width="125"
                         Height="50"
                         Content="Uninstall" />
