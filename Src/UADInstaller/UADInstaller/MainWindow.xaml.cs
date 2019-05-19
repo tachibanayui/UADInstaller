@@ -230,6 +230,9 @@ namespace UADInstaller
         {
             string installLocal = installLoc.Text;
             string btnContent = btnInstall.Content.ToString();
+            if (Path.GetFileName(installLocal) == "UniversalAnimeDownloader")
+                installLocal = Path.Combine(installLocal, "UniversalAnimeDownloader");
+
             if (!string.IsNullOrEmpty(installLocal))
             {
                 try
