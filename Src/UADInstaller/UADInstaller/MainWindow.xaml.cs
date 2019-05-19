@@ -184,7 +184,7 @@ namespace UADInstaller
             return $"<body style=\"color: {rgbValue}\">" + content + " </body>";
         }
 
-        private void FeedbackButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void FeedbackButton_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://github.com/quangaming2929/UniversalAnimeDownloader/issues");
         }
@@ -228,6 +228,8 @@ namespace UADInstaller
 
         private async void Event_Install(object sender, RoutedEventArgs e)
         {
+            try
+            {
             string installLocal = installLoc.Text;
             string btnContent = btnInstall.Content.ToString();
             if (Path.GetFileName(installLocal) != "UniversalAnimeDownloader")
@@ -292,6 +294,11 @@ namespace UADInstaller
             else
             {
                 MessageBox.Show("Please enter a directory to start download");
+            }
+            }
+            catch
+            {
+                MessageBox.Show("Error occured! Please try again");
             }
         }
 
@@ -484,47 +491,54 @@ namespace UADInstaller
 
         private async void Event_Uninstall(object sender, RoutedEventArgs e)
         {
-            string installLoc = this.installLoc.Text;
-            string UADSettings = Path.Combine(installLoc, "Settings", "UserSetting.json");
-            string animeLibrary = string.Empty;
-
-            await Task.Run(() => 
+            try
             {
-                if (File.Exists(UADSettings))
+                string installLoc = this.installLoc.Text;
+                string UADSettings = Path.Combine(installLoc, "Settings", "UserSetting.json");
+                string animeLibrary = string.Empty;
+
+                await Task.Run(() =>
                 {
-                    var content = File.ReadAllText(UADSettings);
-                    animeLibrary = JsonConvert.DeserializeObject<UADSettingsData>(content, JsonSetting)?.AnimeLibraryLocation;
-                }
+                    if (File.Exists(UADSettings))
+                    {
+                        var content = File.ReadAllText(UADSettings);
+                        animeLibrary = JsonConvert.DeserializeObject<UADSettingsData>(content, JsonSetting)?.AnimeLibraryLocation;
+                    }
 
-                foreach (var item in Directory.EnumerateDirectories(installLoc))
-                {
-                    if (item != animeLibrary)
-                        Directory.Delete(item, true);
-                }
+                    foreach (var item in Directory.EnumerateDirectories(installLoc))
+                    {
+                        if (item != animeLibrary)
+                            Directory.Delete(item, true);
+                    }
 
-                foreach (var item in Directory.EnumerateFiles(installLoc))
-                {
-                    File.Delete(item);
-                }
+                    foreach (var item in Directory.EnumerateFiles(installLoc))
+                    {
+                        File.Delete(item);
+                    }
 
-                //Delete Shortcut
-                IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
-                string desktopShortcut = (string)shell.SpecialFolders.Item("Desktop") + @"\Universal Anime Downloader.lnk";
-                string startupMenu = (string)shell.SpecialFolders.Item("Programs") + @"\Universal Anime Downloader.lnk";
-                if (File.Exists(desktopShortcut))
-                    File.Delete(desktopShortcut);
-                if (File.Exists(startupMenu))
-                    File.Delete(startupMenu);
-            });
+                    //Delete Shortcut
+                    IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
+                    string desktopShortcut = (string)shell.SpecialFolders.Item("Desktop") + @"\Universal Anime Downloader.lnk";
+                    string startupMenu = (string)shell.SpecialFolders.Item("Programs") + @"\Universal Anime Downloader.lnk";
+                    if (File.Exists(desktopShortcut))
+                        File.Delete(desktopShortcut);
+                    if (File.Exists(startupMenu))
+                        File.Delete(startupMenu);
+                });
 
-            btnInstall.IsEnabled = true;
-            btnInstall.Content = "Install";
-            btnLaunch.IsEnabled = false;
-            btnUnistall.IsEnabled = false;
-            btnLocate.IsEnabled = true;
+                btnInstall.IsEnabled = true;
+                btnInstall.Content = "Install";
+                btnLaunch.IsEnabled = false;
+                btnUnistall.IsEnabled = false;
+                btnLocate.IsEnabled = true;
 
-            if(File.Exists(UADLocStore))
-                File.WriteAllText(UADLocStore,"");
+                if (File.Exists(UADLocStore))
+                    File.WriteAllText(UADLocStore, "");
+            }
+            catch
+            {
+                MessageBox.Show("Error Occured! Please try again");
+            }
         }
 
         private void Event_Locate(object sender, RoutedEventArgs e)
