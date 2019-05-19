@@ -264,6 +264,7 @@ namespace UADInstaller
                             Dispatcher.Invoke(() => pgStatus.Value = 0.95);
                             GetDefaultMod();
                             CreateShortCut();
+                            CreateMaintainceFile();
                         }
 
                         Dispatcher.Invoke(() =>
@@ -285,19 +286,41 @@ namespace UADInstaller
                 }
                 catch { }
             }
+            else
+            {
+                MessageBox.Show("Please enter a directory to start download");
+            }
+        }
 
+        private void CreateMaintainceFile()
+        {
+            string installLocal = string.Empty;
+            Dispatcher.Invoke(() =>
+            {
+                installLocal = installLoc.Text;
+            });
+
+            var maintanceFolder = Path.Combine(installLocal, "Maintance");
+            if (!Directory.Exists(maintanceFolder))
+                Directory.CreateDirectory(maintanceFolder);
+            File.WriteAllText(Path.Combine(maintanceFolder, "UADInstallerLoc.txt"), Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UADInstalller.exe"));
         }
 
         private void CreateShortCut()
         {
+            string installLocal = string.Empty;
+            Dispatcher.Invoke(() =>
+            {
+                installLocal = installLoc.Text;
+            });
+
             //Desktop shortcut
             IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
             string shortcutAddress = (string)shell.SpecialFolders.Item("Desktop") + @"\Universal Anime Downloader.lnk";
             IWshRuntimeLibrary.IWshShortcut shortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(shortcutAddress);
             shortcut.Description = "Universal Anime Downloader (UAD) is a anime downloader/extractor tool to get and watch anime with minimal effort to search and download. This program also a video player with unique feature help you watch anime easier ";
-            string isnLoc = string.Empty;
             Dispatcher.Invoke(() => installLoc.Text);
-            shortcut.TargetPath = Path.Combine(isnLoc, "UniversalAnimeDownloader.exe");
+            shortcut.TargetPath = Path.Combine(installLocal, "UniversalAnimeDownloader.exe");
             //shortcut.IconLocation = 
             shortcut.Save();
 
@@ -307,7 +330,7 @@ namespace UADInstaller
             string shortcutAddress2 = (string)shell2.SpecialFolders.Item("Programs") + @"\Universal Anime Downloader.lnk";
             IWshRuntimeLibrary.IWshShortcut shortcut2 = (IWshRuntimeLibrary.IWshShortcut)shell2.CreateShortcut(shortcutAddress2);
             shortcut2.Description = "Universal Anime Downloader (UAD) is a anime downloader/extractor tool to get and watch anime with minimal effort to search and download. This program also a video player with unique feature help you watch anime easier ";
-            shortcut2.TargetPath = Path.Combine(isnLoc, "UniversalAnimeDownloader.exe");
+            shortcut2.TargetPath = Path.Combine(installLocal, "UniversalAnimeDownloader.exe");
             //shortcut2.IconLocation = 
             shortcut2.Save();
         }
@@ -480,6 +503,15 @@ namespace UADInstaller
                 {
                     File.Delete(item);
                 }
+
+                //Delete Shortcut
+                IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
+                string desktopShortcut = (string)shell.SpecialFolders.Item("Desktop") + @"\Universal Anime Downloader.lnk";
+                string startupMenu = (string)shell.SpecialFolders.Item("Programs") + @"\Universal Anime Downloader.lnk";
+                if (File.Exists(desktopShortcut))
+                    File.Delete(desktopShortcut);
+                if (File.Exists(startupMenu))
+                    File.Delete(startupMenu);
             });
 
             btnInstall.IsEnabled = true;
