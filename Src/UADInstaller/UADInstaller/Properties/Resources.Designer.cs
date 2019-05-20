@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace UADInstaller.Properties
-{
-
-
+namespace UADInstaller.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -19,52 +19,98 @@ namespace UADInstaller.Properties
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources
-    {
-
+    internal class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if ((resourceMan == null))
-                {
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("UADInstaller.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MediumIconUniversalAnimeDownloader {
+            get {
+                object obj = ResourceManager.GetObject("MediumIconUniversalAnimeDownloader", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot;?&gt;
+        ///&lt;ShortcutItemImage xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+        ///  &lt;OriginalBytes&gt;iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAGxCSURBVHhe7Z0HWFzXlfjl/HfTyyZxerLZbLwp3pR1bAmmwDBDm94rRYAqAqHeERpJ9N5776L3DgJULUtO7PTEcRLHvfeiev/nvHmDKDOAZJBG0v193/kGhnffjFN+Pue+e89dQaFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MediumIconUniversalAnimeDownloader_Metadata {
+            get {
+                return ResourceManager.GetString("MediumIconUniversalAnimeDownloader_Metadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SmallIconUniversalAnimeDownloader {
+            get {
+                object obj = ResourceManager.GetObject("SmallIconUniversalAnimeDownloader", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot;?&gt;
+        ///&lt;ShortcutItemImage xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+        ///  &lt;OriginalBytes&gt;iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAGxCSURBVHhe7Z0HWFzXlfjl/HfTyyZxerLZbLwp3pR1bAmmwDBDm94rRYAqAqHeERpJ9N5776L3DgJULUtO7PTEcRLHvfeiev/nvHmDKDOAZJBG0v193/kGhnffjFN+Pue+e89dQaFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SmallIconUniversalAnimeDownloader_Metadata {
+            get {
+                return ResourceManager.GetString("SmallIconUniversalAnimeDownloader_Metadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;Application xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; GeneratedByTileIconifier=&quot;true&quot;&gt;
+        ///  &lt;VisualElements ShowNameOnSquare150x150Logo=&quot;on&quot; Square150x150Logo=&quot;VisualElements\MediumIconUniversalAnimeDownloader.png&quot; Square70x70Logo=&quot;VisualElements\SmallIconUniversalAnimeDownloader.png&quot; ForegroundText=&quot;light&quot; BackgroundColor=&quot;#000000&quot; /&gt;
+        ///&lt;/Application&gt;.
+        /// </summary>
+        internal static string UniversalAnimeDownloader_VisualElementsManifest {
+            get {
+                return ResourceManager.GetString("UniversalAnimeDownloader_VisualElementsManifest", resourceCulture);
             }
         }
     }

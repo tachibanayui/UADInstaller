@@ -364,6 +364,13 @@ namespace UADInstaller
             shortcut2.TargetPath = Path.Combine(installLocal, "UniversalAnimeDownloader.exe");
             //shortcut2.IconLocation = 
             shortcut2.Save();
+
+            File.WriteAllText(Path.Combine(installLocal, "UniversalAnimeDownloader.VisualElementsManifest.xml"), Properties.Resources.UniversalAnimeDownloader_VisualElementsManifest);
+            File.WriteAllText(Path.Combine(installLocal, "VisualElements", "MediumIconUniversalAnimeDownloader_Metadata.xml"), Properties.Resources.MediumIconUniversalAnimeDownloader_Metadata);
+            File.WriteAllText(Path.Combine(installLocal, "VisualElements", "SmallIconUniversalAnimeDownloader_Metadata.xml"), Properties.Resources.SmallIconUniversalAnimeDownloader_Metadata);
+            //File.WriteAllBytes(@"C:\filename.extension", Properties.Resources.MediumIconUniversalAnimeDownloader);
+            Properties.Resources.MediumIconUniversalAnimeDownloader.Save(Path.Combine(installLocal, "VisualElements", "MediumIconUniversalAnimeDownloader.png"));
+            Properties.Resources.SmallIconUniversalAnimeDownloader.Save(Path.Combine(installLocal, "VisualElements", "SmallIconUniversalAnimeDownloader.png"));
         }
 
         private void GetDefaultMod()
