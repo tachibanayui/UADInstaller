@@ -14,7 +14,8 @@
     Title="Universal Anime Downloader Installer"
     Width="960"
     Height="600"
-    mc:Ignorable="d" Icon="Resources/SmallIconUniversalAnimeDownloader.png">
+    mc:Ignorable="d" 
+    Icon="Resources/SmallIconUniversalAnimeDownloader.png">
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <Button Click="FeedbackButton_Click" Content="Feedback" />
@@ -32,8 +33,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150" />
             <ColumnDefinition Width="10" />
-            <ColumnDefinition Width="551*" />
-            <ColumnDefinition Width="231*"/>
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -41,7 +41,10 @@
             <RowDefinition Height="10" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Image Width="150" Height="150" Source="Resources/MediumIconUniversalAnimeDownloader.png" Margin="0,11"/>
+        <Rectangle	        
+            Height="150"	
+            VerticalAlignment="Top"	
+            Fill="MediumPurple" />
         <TextBlock
             Grid.Column="2"
             Height="48"
@@ -49,13 +52,13 @@
             VerticalAlignment="Top"
             FontSize="36"
             Foreground="MediumPurple"
-            Text="Universal Anime Downloader" Grid.ColumnSpan="2" />
+            Text="Universal Anime Downloader" />
         <TextBlock
             x:Name="txblVersion"
             Grid.Column="2"
             Margin="20,70"
             FontSize="24"
-            Foreground="LightGray" Grid.ColumnSpan="2" />
+            Foreground="LightGray" />
         <Grid
             Grid.Column="2"
             Width="500"
@@ -83,7 +86,7 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
             Background="{Binding ElementName=wd, Path=Background}"
-            Visibility="Collapsed" Margin="0,0,0,10" Grid.Row="1">
+            Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="5" />
@@ -95,13 +98,13 @@
                 Text="Getting newest update infomation..." />
             <ProgressBar
                 x:Name="pgStatus"
-                Grid.Row="2"
+                Grid.Row="1"
                 IsIndeterminate="True"
                 Maximum="1"
                 Minimum="0" />
         </Grid>
         <Grid
-            Grid.Column="3"
+            Grid.Column="2"
             Width="150"
             Height="50"
             Margin="0,25,25,0"
@@ -138,7 +141,7 @@
         </Grid>
         <Button
             x:Name="btnLaunch"
-            Grid.Column="3"
+            Grid.Column="2"
             Width="150"
             Height="50"
             Margin="0,100,25,0"
@@ -149,10 +152,10 @@
             FontSize="24" />
         <Separator
             Grid.Row="1"
-            Grid.ColumnSpan="4"
+            Grid.ColumnSpan="3"
             VerticalAlignment="Bottom"
-            Foreground="White" Margin="0,0,0,2" />
-        <Controls:MetroAnimatedTabControl Grid.Row="2" Grid.ColumnSpan="4">
+            Foreground="White"/>
+        <Controls:MetroAnimatedTabControl Grid.Row="2" Grid.ColumnSpan="3">
             <TabItem Header="Infomation">
                 <Grid>
                     <html:HtmlPanel x:Name="htmlInfo" Background="Transparent" />
