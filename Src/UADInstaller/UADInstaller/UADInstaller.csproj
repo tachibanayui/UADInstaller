@@ -189,5 +189,15 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="StartTile\UniversalAnimeDownloader.VisualElementsManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="StartTile\MediumIconUniversalAnimeDownloader.png" />
+    <Resource Include="StartTile\MediumIconUniversalAnimeDownloader_Metadata.xml" />
+    <Resource Include="StartTile\SmallIconUniversalAnimeDownloader.png" />
+    <Resource Include="StartTile\SmallIconUniversalAnimeDownloader_Metadata.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
