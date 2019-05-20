@@ -14,7 +14,7 @@ using UADInstaller.Jsons;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 using System.Threading.Tasks;
 using System.Linq;
-using Markdown = Markdig.Markdown;
+using MarkdownConvert = Markdig.Markdown;
 
 namespace UADInstaller
 {
@@ -174,7 +174,7 @@ namespace UADInstaller
                         StreamReader reader = new StreamReader(stream);
                         string content = await reader.ReadToEndAsync();
 
-                        var markdownToHtml = Markdig.Markdown.ToHtml(content);
+                        var markdownToHtml = MarkdownConvert.ToHtml(content);
 
                         htmlInfo.Text = AddHtmlColorBody(markdownToHtml, Colors.White);
                     }
