@@ -14,6 +14,8 @@ using UADInstaller.Jsons;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 using System.Threading.Tasks;
 using System.Linq;
+using MarkdownConvert = Markdig.Markdown;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace UADInstaller
 {
@@ -42,6 +44,14 @@ namespace UADInstaller
 
             GetInfomation();
             GetChangeLog();
+            GetInstallPath();
+        }
+
+        private void GetInstallPath()
+        {
+            string programFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            installLoc.Text = Path.Combine(programFilePath, "TachibanaYuiSoftwares", "UniversalAnimeDownloader");
+
         }
 
         private bool CheckForUADLocStore(out string res)
@@ -129,7 +139,7 @@ namespace UADInstaller
                 btnInstall.Content = "Offline";
                 btnInstall.IsEnabled = false;
                 string res;
-                if(CheckForUADLocStore(out res))
+                if (CheckForUADLocStore(out res))
                 {
                     DirectoryInfo info = new DirectoryInfo(res);
                     var exe = Path.Combine(info.Parent.FullName, "UniversalAnimeDownloader.exe");
@@ -162,7 +172,10 @@ namespace UADInstaller
                     {
                         StreamReader reader = new StreamReader(stream);
                         string content = await reader.ReadToEndAsync();
-                        htmlInfo.Text = AddHtmlColorBody(content, Colors.White);
+
+                        var markdownToHtml = MarkdownConvert.ToHtml(content);
+
+                        htmlInfo.Text = AddHtmlColorBody(markdownToHtml, Colors.White);
                     }
                 }
             }
@@ -218,10 +231,18 @@ namespace UADInstaller
 
         private void Event_GetFolder(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            //var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            //if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            //{
+            //    installLoc.Text = dialog.SelectedPath;
+            //}
+
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = installLoc.Text;
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                installLoc.Text = dialog.SelectedPath;
+                installLoc.Text = Path.Combine(dialog.FileName, "TachibanaYuiSoftwares", "UniversalAnimeDownloader");
             }
 
         }
@@ -230,71 +251,71 @@ namespace UADInstaller
         {
             try
             {
-            string installLocal = installLoc.Text;
-            string btnContent = btnInstall.Content.ToString();
-            if (Path.GetFileName(installLocal) != "UniversalAnimeDownloader")
-                installLocal = Path.Combine(installLocal, "UniversalAnimeDownloader");
+                string btnContent = btnInstall.Content.ToString();
+                if (Path.GetFileName(installLoc.Text) != "UniversalAnimeDownloader")
+                    installLoc.Text = Path.Combine(installLoc.Text, "UniversalAnimeDownloader");
+                string installLocal = installLoc.Text;
 
-            if (!string.IsNullOrEmpty(installLocal))
-            {
-                try
+                if (!string.IsNullOrEmpty(installLocal))
                 {
-                    await Task.Run(() => 
+                    try
                     {
-                        Dispatcher.Invoke(() =>
+                        await Task.Run(() =>
                         {
-                            rpProgress.Visibility = Visibility.Visible;
-                            pgStatus.Value = 0;
-                            btnInstall.IsEnabled = false;
-                            txblStatus.Text = "Getting infomation...";
-                            pgStatus.IsIndeterminate = true;
-
-                            if (!Directory.Exists(installLocal))
+                            Dispatcher.Invoke(() =>
                             {
-                                Directory.CreateDirectory(installLocal);
+                                rpProgress.Visibility = Visibility.Visible;
+                                pgStatus.Value = 0;
+                                btnInstall.IsEnabled = false;
+                                txblStatus.Text = "Getting infomation...";
+                                pgStatus.IsIndeterminate = true;
+
+                                if (!Directory.Exists(installLocal))
+                                {
+                                    Directory.CreateDirectory(installLocal);
+                                }
+                            });
+
+                            var lastestFile = GetLastestVersionManger();
+
+                            Dispatcher.Invoke(() => txblStatus.Text = "Checking files...");
+
+                            List<string> filesToDownload = btnContent == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(GetLastestVersionManger(), GetLocalVersionManager());
+                            filesToDownload.Add("VersionManager.json");
+
+                            DownloadFileFromGithub(filesToDownload, installLocal);
+
+                            if (btnContent == "Install")
+                            {
+                                Dispatcher.Invoke(() => pgStatus.Value = 0.95);
+                                GetDefaultMod();
+                                CreateShortCut();
+                                CreateMaintainceFile();
                             }
+
+                            Dispatcher.Invoke(() =>
+                            {
+                                txblStatus.Text = "Done!";
+                                pgStatus.Value = 1;
+                            });
+
+                            File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UADInstallationLocation.txt"), Path.Combine(installLocal, "VersionManager.json"));
                         });
 
-                        var lastestFile = GetLastestVersionManger();
-
-                        Dispatcher.Invoke(() => txblStatus.Text = "Checking files...");
-
-                        List<string> filesToDownload = btnContent == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(GetLastestVersionManger(), GetLocalVersionManager());
-                        filesToDownload.Add("VersionManager.json");
-
-                        DownloadFileFromGithub(filesToDownload, installLocal);
-
-                        if (btnContent == "Install")
-                        {
-                            Dispatcher.Invoke(() => pgStatus.Value = 0.95);
-                            GetDefaultMod();
-                            CreateShortCut();
-                            CreateMaintainceFile();
-                        }
-
-                        Dispatcher.Invoke(() =>
-                        {
-                            txblStatus.Text = "Done!";
-                            pgStatus.Value = 1;
-                        });
-
-                        File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UADInstallationLocation.txt"), Path.Combine(installLocal, "VersionManager.json"));
-                    });
-
-                    await Task.Delay(5000);
-                    rpProgress.Visibility = Visibility.Collapsed;
-                    btnInstall.IsEnabled = false;
-                    btnInstall.Content = "Update";
-                    btnLaunch.IsEnabled = true;
-                    btnUnistall.IsEnabled = true;
-                    btnLocate.IsEnabled = false;
+                        await Task.Delay(5000);
+                        rpProgress.Visibility = Visibility.Collapsed;
+                        btnInstall.IsEnabled = false;
+                        btnInstall.Content = "Update";
+                        btnLaunch.IsEnabled = true;
+                        btnUnistall.IsEnabled = true;
+                        btnLocate.IsEnabled = false;
+                    }
+                    catch { }
                 }
-                catch { }
-            }
-            else
-            {
-                MessageBox.Show("Please enter a directory to start download");
-            }
+                else
+                {
+                    MessageBox.Show("Please enter a directory to start download");
+                }
             }
             catch
             {
@@ -348,7 +369,7 @@ namespace UADInstaller
         private void GetDefaultMod()
         {
             string installLocal = string.Empty;
-            Dispatcher.Invoke(() => 
+            Dispatcher.Invoke(() =>
             {
                 txblStatus.Text = "Downloading default mod...";
                 installLocal = installLoc.Text;
@@ -427,9 +448,9 @@ namespace UADInstaller
             foreach (var item in newVersion.FileVersion)
             {
                 var oldVerItem = oldVersion.FileVersion.FirstOrDefault(p => p.FileName == item.FileName);
-                if(oldVersion != null)
+                if (oldVersion != null)
                 {
-                    if(oldVerItem.Version < item.Version)
+                    if (oldVerItem.Version < item.Version)
                     {
                         res.Add(item.FileName);
                     }
@@ -470,10 +491,10 @@ namespace UADInstaller
 
         private VersionManager GetLocalVersionManager()
         {
-            if(File.Exists(UADLocStore))
+            if (File.Exists(UADLocStore))
             {
                 var versionManagerFile = File.ReadAllText(UADLocStore);
-                if(File.Exists(versionManagerFile))
+                if (File.Exists(versionManagerFile))
                 {
                     var managerFileContent = File.ReadAllText(versionManagerFile);
                     return JsonConvert.DeserializeObject<VersionManager>(managerFileContent);
