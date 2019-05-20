@@ -14,6 +14,7 @@ using UADInstaller.Jsons;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 using System.Threading.Tasks;
 using System.Linq;
+using Markdown = Markdig.Markdown;
 
 namespace UADInstaller
 {
@@ -42,6 +43,16 @@ namespace UADInstaller
 
             GetInfomation();
             GetChangeLog();
+            GetInstallPath();
+        }
+
+        private void GetInstallPath()
+        {
+            string programFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            if (Environment.Is64BitOperatingSystem)
+            {
+                installLoc.Text = programFilePath + @"\TachibanaYuiSoftwares\UAD\";
+            }
         }
 
         private bool CheckForUADLocStore(out string res)
@@ -162,7 +173,10 @@ namespace UADInstaller
                     {
                         StreamReader reader = new StreamReader(stream);
                         string content = await reader.ReadToEndAsync();
-                        htmlInfo.Text = AddHtmlColorBody(content, Colors.White);
+
+                        var markdownToHtml = Markdig.Markdown.ToHtml(content);
+
+                        htmlInfo.Text = AddHtmlColorBody(markdownToHtml, Colors.White);
                     }
                 }
             }
