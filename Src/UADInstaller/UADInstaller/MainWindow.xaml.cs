@@ -366,6 +366,7 @@ namespace UADInstaller
             shortcut2.Save();
 
             File.WriteAllText(Path.Combine(installLocal, "UniversalAnimeDownloader.VisualElementsManifest.xml"), Properties.Resources.UniversalAnimeDownloader_VisualElementsManifest);
+            Directory.CreateDirectory(Path.Combine(installLocal, "VisualElements"));
             File.WriteAllText(Path.Combine(installLocal, "VisualElements", "MediumIconUniversalAnimeDownloader_Metadata.xml"), Properties.Resources.MediumIconUniversalAnimeDownloader_Metadata);
             File.WriteAllText(Path.Combine(installLocal, "VisualElements", "SmallIconUniversalAnimeDownloader_Metadata.xml"), Properties.Resources.SmallIconUniversalAnimeDownloader_Metadata);
             //File.WriteAllBytes(@"C:\filename.extension", Properties.Resources.MediumIconUniversalAnimeDownloader);
@@ -571,10 +572,18 @@ namespace UADInstaller
 
         private void Event_Locate(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            //var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            //if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            //{
+            //    File.WriteAllText(UADLocStore, Path.Combine(dialog.SelectedPath, "VersionManager.json"));
+            //    CheckInstallationStatus();
+            //}
+
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                File.WriteAllText(UADLocStore, Path.Combine(dialog.SelectedPath, "VersionManager.json"));
+                File.WriteAllText(UADLocStore, Path.Combine(dialog.FileName, "VersionManager.json"));
                 CheckInstallationStatus();
             }
         }
