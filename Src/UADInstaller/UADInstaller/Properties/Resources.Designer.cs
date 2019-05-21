@@ -63,6 +63,16 @@ namespace UADInstaller.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap icon {
+            get {
+                object obj = ResourceManager.GetObject("icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap MediumIconUniversalAnimeDownloader {
             get {
                 object obj = ResourceManager.GetObject("MediumIconUniversalAnimeDownloader", resourceCulture);
@@ -105,7 +115,7 @@ namespace UADInstaller.Properties {
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         ///&lt;Application xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; GeneratedByTileIconifier=&quot;true&quot;&gt;
-        ///  &lt;VisualElements ShowNameOnSquare150x150Logo=&quot;on&quot; Square150x150Logo=&quot;VisualElements\MediumIconUniversalAnimeDownloader.png&quot; Square70x70Logo=&quot;VisualElements\SmallIconUniversalAnimeDownloader.png&quot; ForegroundText=&quot;light&quot; BackgroundColor=&quot;#000000&quot; /&gt;
+        ///  &lt;VisualElements ShowNameOnSquare150x150Logo=&quot;off&quot; Square150x150Logo=&quot;VisualElements\MediumIconUniversalAnimeDownloader.png&quot; Square70x70Logo=&quot;VisualElements\SmallIconUniversalAnimeDownloader.png&quot; ForegroundText=&quot;light&quot; BackgroundColor=&quot;#000000&quot; /&gt;
         ///&lt;/Application&gt;.
         /// </summary>
         internal static string UniversalAnimeDownloader_VisualElementsManifest {

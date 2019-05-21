@@ -15,8 +15,8 @@
     Width="960"
     Height="600"
     mc:Ignorable="d"
-    Icon="Resources/SmallIconUniversalAnimeDownloader.png">
-    <Controls:MetroWindow.RightWindowCommands>
+    >
+<Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <Button Click="FeedbackButton_Click" Content="Feedback" />
         </Controls:WindowCommands>
