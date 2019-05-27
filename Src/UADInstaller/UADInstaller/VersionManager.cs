@@ -16,5 +16,6 @@ namespace UADInstaller
     {
         public string FileName { get; set; }
         public int Version { get; set; }
+        public string LastChangeVersion { get; set; }
     }
 }

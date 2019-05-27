@@ -14,9 +14,9 @@
     Title="Universal Anime Downloader Installer"
     Width="960"
     Height="600"
-    mc:Ignorable="d"
-    Icon="pack://application:,,,/Resources/SmallIconUniversalAnimeDownloader.png">
-<Controls:MetroWindow.RightWindowCommands>
+    Icon="Resources/icon.png"
+    mc:Ignorable="d">
+    <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <Button Click="FeedbackButton_Click" Content="Feedback" />
         </Controls:WindowCommands>
@@ -41,11 +41,9 @@
             <RowDefinition Height="10" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Rectangle
-            Height="150"
-            VerticalAlignment="Top" >
+        <Rectangle Height="150" VerticalAlignment="Top">
             <Rectangle.Fill>
-                <ImageBrush ImageSource="pack://application:,,,/Resources/MediumIconUniversalAnimeDownloader.png"/>
+                <ImageBrush ImageSource="pack://application:,,,/Resources/MediumIconUniversalAnimeDownloader.png" />
             </Rectangle.Fill>
         </Rectangle>
         <TextBlock
@@ -129,15 +127,15 @@
                 <Controls:DropDownButton.Items>
                     <Button
                         x:Name="btnUnistall"
-                        Click="Event_Uninstall"
                         Width="125"
                         Height="50"
+                        Click="Event_Uninstall"
                         Content="Uninstall" />
                     <Button
                         x:Name="btnLocate"
                         Width="125"
-                        Click="Event_Locate"
                         Height="50"
+                        Click="Event_Locate"
                         Content="Locate" />
                 </Controls:DropDownButton.Items>
             </Controls:DropDownButton>

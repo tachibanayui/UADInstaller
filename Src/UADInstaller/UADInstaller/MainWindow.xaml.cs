@@ -280,8 +280,8 @@ namespace UADInstaller
 
                             Dispatcher.Invoke(() => txblStatus.Text = "Checking files...");
 
-                            List<string> filesToDownload = btnContent == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(GetLastestVersionManger(), GetLocalVersionManager());
-                            filesToDownload.Add("VersionManager.json");
+                            List<FileVersion> filesToDownload = btnContent == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(GetLastestVersionManger(), GetLocalVersionManager());
+                            filesToDownload.Add(new FileVersion() { FileName = "VersionManager.json", LastChangeVersion = ReleasesChangelog[0].tag_name });
 
                             DownloadFileFromGithub(filesToDownload, installLocal);
 
@@ -416,7 +416,7 @@ namespace UADInstaller
 
         }
 
-        private void DownloadFileFromGithub(List<string> filesToDownload, string installLoc)
+        private void DownloadFileFromGithub(List<FileVersion> filesToDownload, string installLoc)
         {
             int currentFile = 1;
             foreach (var item in filesToDownload)
@@ -427,14 +427,14 @@ namespace UADInstaller
                     pgStatus.IsIndeterminate = false;
                     pgStatus.Value = currentFile / (double)filesToDownload.Count * 0.9d;
                 });
-                string url = $"https://raw.githubusercontent.com/quangaming2929/UADInstaller/master/UADVersions/{ReleasesChangelog[0].tag_name}/{item}";
+                string url = $"https://raw.githubusercontent.com/quangaming2929/UADInstaller/master/UADVersions/{item.LastChangeVersion}/{item.FileName}";
                 var req = (HttpWebRequest)WebRequest.Create(url);
                 req.UserAgent = UserAgent;
                 using (var resp = req.GetResponse())
                 {
                     using (var stream = resp.GetResponseStream())
                     {
-                        var loc = Path.Combine(installLoc, item);
+                        var loc = Path.Combine(installLoc, item.FileName);
                         if (File.Exists(installLoc))
                             File.Delete(installLoc);
 
@@ -449,9 +449,9 @@ namespace UADInstaller
             }
         }
 
-        private List<string> CompareFilesVersion(VersionManager oldVersion, VersionManager newVersion)
+        private List<FileVersion> CompareFilesVersion(VersionManager oldVersion, VersionManager newVersion)
         {
-            var res = new List<string>();
+            var res = new List<FileVersion>();
 
             foreach (var item in newVersion.FileVersion)
             {
@@ -460,26 +460,19 @@ namespace UADInstaller
                 {
                     if (oldVerItem.Version < item.Version)
                     {
-                        res.Add(item.FileName);
+                        res.Add(item);
                     }
                 }
                 else
                 {
-                    res.Add(item.FileName);
+                    res.Add(item);
                 }
             }
 
             return res;
         }
 
-        private List<string> GetAllFileToDownload(VersionManager manager)
-        {
-            var filesName = new List<string>();
-            foreach (var item in manager.FileVersion)
-                filesName.Add(item.FileName);
-
-            return filesName;
-        }
+        private List<FileVersion> GetAllFileToDownload(VersionManager manager) => new List<FileVersion>(manager.FileVersion);
 
         private VersionManager GetLastestVersionManger()
         {

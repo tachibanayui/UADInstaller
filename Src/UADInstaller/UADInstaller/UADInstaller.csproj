@@ -209,7 +209,7 @@
     <None Include="Resources\SmallIconUniversalAnimeDownloader1.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\icon.png" />
+    <Resource Include="Resources\icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
