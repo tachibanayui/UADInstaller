@@ -280,7 +280,7 @@ namespace UADInstaller
 
                             Dispatcher.Invoke(() => txblStatus.Text = "Checking files...");
 
-                            List<FileVersion> filesToDownload = btnContent == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(GetLastestVersionManger(), GetLocalVersionManager());
+                            List<FileVersion> filesToDownload = btnContent == "Install" ? GetAllFileToDownload(lastestFile) : CompareFilesVersion(GetLocalVersionManager(), GetLastestVersionManger());
                             filesToDownload.Add(new FileVersion() { FileName = "VersionManager.json", LastChangeVersion = ReleasesChangelog[0].tag_name });
 
                             DownloadFileFromGithub(filesToDownload, installLocal);
@@ -423,7 +423,7 @@ namespace UADInstaller
             {
                 Dispatcher.Invoke(() =>
                 {
-                    txblStatus.Text = $"Downloading {item} ({currentFile}/{filesToDownload.Count})...";
+                    txblStatus.Text = $"Downloading {item.FileName} ({currentFile}/{filesToDownload.Count})...";
                     pgStatus.IsIndeterminate = false;
                     pgStatus.Value = currentFile / (double)filesToDownload.Count * 0.9d;
                 });
@@ -456,7 +456,7 @@ namespace UADInstaller
             foreach (var item in newVersion.FileVersion)
             {
                 var oldVerItem = oldVersion.FileVersion.FirstOrDefault(p => p.FileName == item.FileName);
-                if (oldVersion != null)
+                if (oldVerItem != null)
                 {
                     if (oldVerItem.Version < item.Version)
                     {
