@@ -11,7 +11,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="clr-namespace:Markdown.Xaml;assembly=Markdown.Xaml"
     x:Name="wd"
-    Title="Universal Anime Downloader Installer"
+    Title="Hoang Gay"
     Width="960"
     Height="600"
     mc:Ignorable="d"
